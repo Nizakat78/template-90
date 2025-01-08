@@ -1,6 +1,6 @@
 import React from 'react';
 import { RxCaretRight } from "react-icons/rx";
-import AboutUsSection from './AboutUS';
+import Knowabout from './Knowabout';
 
 const Page = () => {
   return (
@@ -19,7 +19,7 @@ const Page = () => {
           <span className="text-yellow-500">About</span>
         </p>
       </div>
-      <AboutUsSection />
+     <Knowabout />
     </div>
   );
 };

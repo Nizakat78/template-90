@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Herosection() {
   return (
@@ -28,9 +29,11 @@ export default function Herosection() {
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Varius sed
             pharetra dictum neque massa congue.
           </p>
+          <Link href="/Menu" className="text-orange-500 hover:text-orange-600">
           <button className="mt-6 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg">
             See Menu
           </button>
+          </Link>
         </div>
 
         {/* Image Content */}

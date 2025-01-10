@@ -54,12 +54,12 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li>
-            <Link href="/menu" className="hover:text-yellow-400">
+            <Link href="/Menu" className="hover:text-yellow-400">
               Menu
             </Link>
           </li>
           <li>
-            <Link href="/blog" className="hover:text-yellow-400">
+            <Link href="/Blog" className="hover:text-yellow-400">
               Blog
             </Link>
           </li>
@@ -69,12 +69,12 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li>
-            <Link href="/about" className="hover:text-yellow-400">
+            <Link href="/About" className="hover:text-yellow-400">
               About
             </Link>
           </li>
           <li>
-            <Link href="/shop" className="hover:text-yellow-400">
+            <Link href="/Shop" className="hover:text-yellow-400">
               Shop
             </Link>
           </li>

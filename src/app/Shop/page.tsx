@@ -1,6 +1,6 @@
 import React from 'react'
 import { RxCaretRight } from "react-icons/rx";
-import Product from './Product';
+import Product from '../../components/Shop/Product';
 const page = () => {
   return (
     <div>

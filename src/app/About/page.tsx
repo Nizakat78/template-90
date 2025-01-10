@@ -1,10 +1,14 @@
 import React from 'react';
 import { RxCaretRight } from "react-icons/rx";
 import Knowabout from './Knowabout';
+import Bestchef from './BestChef';
+import TeamMember from './Teamview';
+import Testmonialsman from './Testmonialsman';
+import Menubar from './Menubar';
 
 const Page = () => {
   return (
-    <div>
+    <div className='bg-white'>
       {/* Background Section */}
       <div className="w-full h-60 sm:h-96 bg-[url('/Menubg1.svg')] bg-cover bg-center"></div>
 
@@ -20,6 +24,10 @@ const Page = () => {
         </p>
       </div>
      <Knowabout />
+     <Bestchef />
+     <TeamMember />
+     <Testmonialsman />
+     <Menubar />
     </div>
   );
 };

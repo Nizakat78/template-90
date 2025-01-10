@@ -1,19 +1,19 @@
-import HeroSection from "../components/Herosection";
-import AboutHero from "../components/AboutHero";
-import FoodCategory from "../components/FoodCategory";
-import WhyChooseUs from "../components/Whychoose";
-import Client from "../components/Client";
-import MenuSection from "../components/Menusection";
-import Chief from "../components/Chief"
-import Testimonials from "../components/Testimonials"
-import RestaurantActiveProcess from "../components/RestaurantActiveProcess";
-import Blognews from "../components/Blognews"
+import Herosection from "../components/Home/Herosection";
+import AboutHero from "../components/Home/AboutHero";
+import FoodCategory from "../components/Home/FoodCategory";
+import WhyChooseUs from "../components/Home/Whychoose";
+import Client from "../components/Home/Client";
+import MenuSection from "../components/Home/Menusection";
+import Chief from "../components/Home/Chief"
+import Testimonials from "../components/Home/Testimonials"
+import RestaurantActiveProcess from "../components/Home/RestaurantActiveProcess";
+import Blognews from "../components/Home/Blognews"
 
 
 export default function Home() {
   return (
     <div>
-      <HeroSection />
+      <Herosection />
       <AboutHero />
       <FoodCategory />
       <WhyChooseUs />

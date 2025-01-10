@@ -2,8 +2,8 @@ import React from 'react';
 import { RxCaretRight } from "react-icons/rx";
 import Image from 'next/image';
 import { SiCoffeescript } from "react-icons/si";
-import StatsSection from './StatsSection';
-import Partners from './Partners';
+import StatsSection from '../../components/Menu/StatsSection';
+import Partners from '../../components/Menu/Partners';
 
 
 const Page = () => {

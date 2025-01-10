@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li>
-            <Link href="/pages" className="hover:text-yellow-400">
+            <Link href="/FAQpage" className="hover:text-yellow-400">
               Pages
             </Link>
           </li>
@@ -79,7 +79,7 @@ const Navbar: React.FC = () => {
             </Link>
           </li>
           <li>
-            <Link href="/contact" className="hover:text-yellow-400">
+            <Link href="/Contact" className="hover:text-yellow-400">
               Contact
             </Link>
           </li>

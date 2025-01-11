@@ -146,7 +146,7 @@ const ProductCart: React.FC = () => {
         </table>
 
         {/* Coupon Code and Total Bill Section */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="p-4 border border-gray-300 rounded">
             <h2 className="text-lg font-semibold mb-2">Coupon Code</h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -158,7 +158,7 @@ const ProductCart: React.FC = () => {
                 type="text"
                 value={coupon}
                 onChange={(e) => setCoupon(e.target.value)}
-                placeholder="Enter Here code"
+                placeholder="Enter coupon code"
                 className="flex-1 px-4 py-2 border border-gray-300 rounded"
               />
               <button className="px-4 py-2 bg-orange-500 text-white rounded">
@@ -183,10 +183,12 @@ const ProductCart: React.FC = () => {
             </div>
           </div>
         </div>
-            <Link href="/Checkout">
-        <button className="w-full mt-4 py-3 bg-orange-500 text-white text-center text-lg font-semibold rounded">
-          Proceed to Checkout
-        </button>
+
+        {/* Proceed to Checkout Button */}
+        <Link href="/Checkout">
+          <button className="w-full mt-4 py-3 bg-orange-500 text-white text-center text-lg font-semibold rounded">
+            Proceed to Checkout
+          </button>
         </Link>
       </div>
     </div>

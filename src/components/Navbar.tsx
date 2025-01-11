@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-black w-full h-[87px] text-white border-b border-yellow-400">
+    <nav className="bg-black w-full h-[87px] text-white relative z-20">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="text-yellow-400 font-bold text-xl">
@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
 
         {/* Navigation Links */}
         <ul
-          className={`absolute top-[87px] left-0 w-full bg-black text-center transition-all duration-300 ease-in-out md:relative md:top-0 md:left-0 md:flex md:space-x-6 md:items-center md:w-auto md:bg-transparent ${
+          className={`absolute top-[87px] left-0 w-full bg-black text-center transition-all duration-300 ease-in-out md:relative md:top-0 md:left-0 md:flex md:space-x-6 md:items-center md:w-auto md:bg-transparent z-10 ${
             isMenuOpen ? "block" : "hidden"
           }`}
         >
@@ -131,6 +131,14 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Mobile Overlay for Menu */}
+      {isMenuOpen && (
+        <div
+          onClick={() => setIsMenuOpen(false)}
+          className="fixed inset-0 bg-black opacity-50 z-0"
+        ></div>
+      )}
     </nav>
   );
 };

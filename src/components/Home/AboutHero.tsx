@@ -9,13 +9,17 @@ const AboutSection = () => {
         <div className="lg:w-1/2">
           <h3 className="italic text-orange-500 text-lg mb-4">About us!</h3>
           {/* Main Content */}
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
             <span className="text-yellow-500">We</span> Create the best foody product
           </h2>
-          <p className="mb-6 text-gray-300">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque diam pellentesque bibendum non dui volutpat fringilla bibendum. Urna, elit augue urna, vitae feugiat pretium donec id elementum. Ultrices mattis sed vitae risus risus. Lacus nisi, et ac dapibus sit eu velit in consequat.
+          <p className="mb-6 text-gray-300 text-sm md:text-base">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque diam
+            pellentesque bibendum non dui volutpat fringilla bibendum. Urna, elit
+            augue urna, vitae feugiat pretium donec id elementum. Ultrices mattis
+            sed vitae risus risus. Lacus nisi, et ac dapibus sit eu velit in
+            consequat.
           </p>
-          <ul className="space-y-4 mb-6">
+          <ul className="space-y-4 mb-6 text-sm md:text-base">
             <li className="flex items-center">
               <span className="text-yellow-500 mr-2">✔</span>
               Lacus nisi, et ac dapibus sit eu velit in consequat.
@@ -37,7 +41,6 @@ const AboutSection = () => {
         {/* Images */}
         <div className="lg:w-1/2 flex flex-col items-center lg:items-end gap-4">
           <div className="w-full">
-
             <Image
               src="/pic1.svg"
               alt="Main Dish"
@@ -47,7 +50,7 @@ const AboutSection = () => {
               priority={true}
             />
           </div>
-          <div className="flex gap-4 top-[1416px] left-[960px] rounded-6xl">
+          <div className="flex flex-col md:flex-row gap-4">
             <Image
               src="/pic2.svg"
               alt="Dish 1"

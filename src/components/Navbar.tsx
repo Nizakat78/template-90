@@ -8,6 +8,10 @@ import { FaSearch } from "react-icons/fa";
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const handleMenuItemClick = () => {
+    setIsMenuOpen(false); // Close the menu when a link is clicked
+  };
+
   return (
     <nav className="bg-black w-full h-[87px] text-white relative z-20">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -49,37 +53,37 @@ const Navbar: React.FC = () => {
           }`}
         >
           <li className="py-2 md:py-0">
-            <Link href="/" className="hover:text-yellow-400">
+            <Link href="/" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Home
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/Menu" className="hover:text-yellow-400">
+            <Link href="/Menu" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Menu
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/Blog" className="hover:text-yellow-400">
+            <Link href="/Blog" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Blog
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/FAQpage" className="hover:text-yellow-400">
+            <Link href="/FAQpage" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Pages
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/About" className="hover:text-yellow-400">
+            <Link href="/About" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               About
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/Shop" className="hover:text-yellow-400">
+            <Link href="/Shop" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Shop
             </Link>
           </li>
           <li className="py-2 md:py-0">
-            <Link href="/Contact" className="hover:text-yellow-400">
+            <Link href="/Contact" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Contact
             </Link>
           </li>
@@ -87,19 +91,22 @@ const Navbar: React.FC = () => {
           {/* Mobile-specific: Cart, Login, Sign Up */}
           <li className="flex justify-center py-2 md:hidden">
             <button
-              onClick={() => (window.location.href = "/Carts")}
+              onClick={() => {
+                window.location.href = "/Carts";
+                handleMenuItemClick();
+              }}
               className="flex items-center justify-center text-yellow-400"
             >
               <MdOutlineShoppingCart className="w-6 h-6" />
             </button>
           </li>
           <li className="py-2 md:hidden">
-            <Link href="/Login" className="hover:text-yellow-400">
+            <Link href="/Login" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Login
             </Link>
           </li>
           <li className="py-2 md:hidden">
-            <Link href="/Signup" className="hover:text-yellow-400">
+            <Link href="/Signup" onClick={handleMenuItemClick} className="hover:text-yellow-400">
               Sign Up
             </Link>
           </li>

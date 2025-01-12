@@ -56,7 +56,7 @@ const MenuSection = () => {
                   colIndex === 0
                     ? [
                         { name: "Lettuce Leaf", price: "12.55", desc: "Fresh and crispy.", image: "/lettue.svg" },
-                        { name: "Fresh Breakfast", price: "12.55", desc: "Start your day right.", image: "/Fresh.svg" },
+                        { name: "Fresh Breakfast", price: "12.55", desc: "Start your day right.", image: "/fresh.svg" },
                         { name: "Mild Butter", price: "12.55", desc: "Smooth and creamy.", image: "/Mild.svg" },
                         { name: "Fresh Bread", price: "12.55", desc: "Soft and warm.", image: "/Freshbrad.svg" },
                       ]

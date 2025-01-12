@@ -8,9 +8,18 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <footer className="bg-black text-white py-8">
+    <footer
+    className="text-white py-8"
+    style={{
+      backgroundImage: `url('/Footbg.svg')`,
+      backgroundSize: 'auto', 
+      backgroundPosition: 'bottom right', 
+      backgroundRepeat: 'no-repeat', 
+    }}
+  >
+  
       {/* Subscribe Section */}
-      <div className="text-white py-8 px-2 border-b-2 border-yellow-600 bg-origin-padding flex flex-col md:flex-row justify-center items-center gap-10">
+      <div className="text-white py-8 px-2 border-b-2 border-yellow-600 bg-origin-padding flex flex-col md:flex-row justify-center items-center gap-10 bg-black/60">
         <div className="text-center md:text-left">
           <h2 className="text-2xl mb-2 font-bold">
             <span className="text-orange-500">St</span>ill You Need Our Support?
@@ -32,7 +41,7 @@ const Footer = () => {
       </div>
 
       {/* Footer Content */}
-      <div className="container mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 bg-black/60">
         {/* About Us Section */}
         <div>
           <h2 className="text-lg font-bold mb-4">About Us</h2>
@@ -82,12 +91,12 @@ const Footer = () => {
             {/* Post 1 */}
             <li className="flex gap-2 items-center">
               <div className="w-16 h-16 bg-gray-700 rounded-md overflow-hidden">
-               <Link href="/post1">
-                <img
-                  src="/RecentPost.svg"
-                  alt="Post 1"
-                  className="w-full h-full object-cover"
-                />
+                <Link href="/post1">
+                  <img
+                    src="/RecentPost.svg"
+                    alt="Post 1"
+                    className="w-full h-full object-cover"
+                  />
                 </Link>
               </div>
               <div>
@@ -99,11 +108,11 @@ const Footer = () => {
             <li className="flex gap-2 items-center">
               <div className="w-16 h-16 bg-gray-700 rounded-md overflow-hidden">
                 <Link href="/post2">
-                <img
-                  src="/RecentPost.svg"
-                  alt="Post 2"
-                  className="w-full h-full object-cover"
-                />
+                  <img
+                    src="/RecentPost.svg"
+                    alt="Post 2"
+                    className="w-full h-full object-cover"
+                  />
                 </Link>
               </div>
               <div>
@@ -115,11 +124,11 @@ const Footer = () => {
             <li className="flex gap-2 items-center">
               <div className="w-16 h-16 bg-gray-700 rounded-md overflow-hidden">
                 <Link href="/post3">
-                <img
-                  src="/RecentPost.svg"
-                  alt="Post 3"
-                  className="w-full h-full object-cover"
-                />
+                  <img
+                    src="/RecentPost.svg"
+                    alt="Post 3"
+                    className="w-full h-full object-cover"
+                  />
                 </Link>
               </div>
               <div>
@@ -132,7 +141,7 @@ const Footer = () => {
       </div>
 
       {/* Footer Bottom */}
-      <div className="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400">
+      <div className="border-t border-gray-700 mt-8 pt-4 text-center text-sm text-gray-400 bg-black/60">
         <p>Copyright © 2024 by Nizakat Ali. All Rights Reserved.</p>
         <div className="flex justify-center gap-4 mt-2">
           <a href="#" className="hover:text-yellow-500"><FaFacebookF /></a>

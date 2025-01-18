@@ -1,66 +1,92 @@
-import React from "react";
-import Head from "next/head";
+import { client, urlFor } from '../../lib/sanityClient';
 import { MdArrowCircleRight } from "react-icons/md";
 import { FaAnglesLeft } from "react-icons/fa6";
 import { FaAngleDoubleRight } from "react-icons/fa";
 import { LiaSearchSolid } from "react-icons/lia";
 
-const products = [
-  { name: "Fresh Lime", price: 45, discountPrice: 38, image: "/Shop1.svg" },
-  { name: "Chocolate Muffin", price: 45, discountPrice: 21, image: "/Shop2.svg", isNew: true },
-  { name: "Burger", price: 43, image: "/Shop3.svg" },
-  { name: "Country Burger", price: 45, discountPrice: 23, image: "/Shop4.svg" },
-  { name: "Drink", price: 25, image: "/Shop5.svg" },
-  { name: "Pizza", price: 12, image: "/Shop6.svg", isNew: true },
-  { name: "Cheese Butter", price: 45, discountPrice: 38, image: "/Shop7.svg" },
-  { name: "Sandwiches", price: 45, discountPrice: 21, image: "/Shop8.svg", isNew: true },
-  { name: "Chicken Chup", price: 43, image: "/Shop9.svg" },
-  { name: "Country Burger", price: 45, discountPrice: 23, image: "/Shop10.svg" },
-  { name: "Drink", price: 25, image: "/Shop11.svg" },
-  { name: "Pizza", price: 12, image: "/Shop12.svg", isNew: true },
-  { name: "Cheese Butter", price: 45, discountPrice: 23, image: "/Shop13.svg" },
-  { name: "Sandwiches", price: 25, image: "/Shop14.svg" },
-  { name: "Chicken Chup", price: 12, image: "/Shop15.svg", isNew: true },
-];
+// Define TypeScript type for Food data
+interface Food {
+  _id: string;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  tags?: string[];
+  description?: string;
+  available: boolean;
+  image?: {
+    asset: {
+      _ref: string;
+    };
+  };
+}
 
-export default function Home() {
+// Fetch food data from Sanity
+async function getFoods(): Promise<Food[]> {
+  const query = `*[_type == "food"]{
+    _id,
+    name,
+    category,
+    price,
+    originalPrice,
+    tags,
+    description,
+    available,
+    image {
+      asset -> {
+        _id,
+        url
+      }
+    }
+  }`;
+  const foods = await client.fetch(query);
+  return foods;
+}
+
+// Foods page component
+export default async function FoodsPage() {
+  const foods = await getFoods();
+
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Head>
-        <title>Shop</title>
-        <meta name="description" content="Shop Page" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Products Grid */}
           <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product, index) => (
+            {foods.map((food) => (
               <div
-                key={index}
+                key={food._id}
                 className="bg-white shadow-md rounded-md overflow-hidden"
               >
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-40 object-cover"
-                />
+                {food.image && food.image.asset ? (
+                  <img
+                    src={urlFor(food.image).width(300).url()} // Generate image URL
+                    alt={food.name}
+                    className="w-full h-40 object-cover"
+                  />
+                ) : (
+                  <img
+                    src="/placeholder.jpg" // Fallback image
+                    alt="Placeholder"
+                    className="w-full h-40 object-cover"
+                  />
+                )}
                 <div className="p-4">
-                  <h2 className="text-lg font-semibold">{product.name}</h2>
+                  <h2 className="text-lg font-semibold">{food.name}</h2>
                   <div className="flex items-center justify-between mt-2">
-                    {product.discountPrice && (
+                    {food.originalPrice && (
                       <span className="text-gray-500 line-through">
-                        ${product.price}
+                        ₹{food.originalPrice}
                       </span>
                     )}
-                    <span className="text-xl font-bold">
-                      ${product.discountPrice || product.price}
-                    </span>
+                    <span className="text-xl font-bold">₹{food.price}</span>
                   </div>
-                  {product.isNew && (
-                    <span className="text-sm text-orange-500">New</span>
+                  {food.available ? (
+                    <span className="text-sm text-green-500">Available</span>
+                  ) : (
+                    <span className="text-sm text-red-500">Unavailable</span>
                   )}
+                  <p className="text-sm text-gray-500">{food.description}</p>
                 </div>
               </div>
             ))}
@@ -159,7 +185,7 @@ export default function Home() {
           </aside>
         </div>
 
-        {/* Buttons at the End */}
+        {/* Pagination Buttons */}
         <div className="mt-8 flex justify-center gap-4">
           <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
             <FaAnglesLeft />
@@ -177,7 +203,7 @@ export default function Home() {
             <FaAngleDoubleRight />
           </button>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

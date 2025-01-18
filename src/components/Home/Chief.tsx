@@ -1,6 +1,38 @@
+"use client"
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { client, urlFor } from '../../lib/sanityClient';
+
+// Define the structure of the image field properly
+type Chef = {
+  name: string;
+  position: string;
+  image: {
+    asset: {
+      _ref: string;
+      _type: string;
+    };
+  };
+};
 
 export default function FoodCategory() {
+  const [chefs, setChefs] = useState<Chef[]>([]);
+
+  useEffect(() => {
+    // Fetch chef data from Sanity
+    const fetchChefs = async () => {
+      const query = `*[_type == "chef"]{
+        name,
+        position,
+        image
+      }`;
+      const data = await client.fetch<Chef[]>(query);
+      setChefs(data);
+    };
+
+    fetchChefs();
+  }, []);
+
   return (
     <section className="relative py-15 bg-cover bg-center">
       {/* Semi-transparent overlay */}
@@ -16,65 +48,28 @@ export default function FoodCategory() {
 
         {/* Flexbox for the chef items */}
         <div className="flex flex-wrap justify-center gap-4">
-          {/* Chef 1 */}
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-lg relative overflow-hidden">
-            <Image
-              src="/Chef1.svg"
-              alt="D.Estwood"
-              width={250}
-              height={250}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute bottom-0 left-0 bg-white bg-opacity-90 p-3">
-              <h3 className="text-lg font-bold text-black text-left">D.Estwood</h3>
-              <p className="text-sm text-gray-600 text-left">Chief Chef</p>
+          {chefs.map((chef, index) => (
+            <div
+              key={index}
+              className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-lg relative overflow-hidden"
+            >
+      
+      
+                
+               <img
+                src={urlFor(chef.image).width(300).url()} // Generate image URL
+                alt={chef.name}
+                className="w-full h-auto object-cover"
+                width={250}
+                height={250}
+              />
+    
+              <div className="absolute bottom-0 left-0 bg-white bg-opacity-90 p-3">
+                <h3 className="text-lg font-bold text-black text-left">{chef.name}</h3>
+                <p className="text-sm text-gray-600 text-left">{chef.position}</p>
+              </div>
             </div>
-          </div>
-
-          {/* Chef 2 */}
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-lg relative overflow-hidden">
-            <Image
-              src="/Chef2.svg"
-              alt="D.Scoriesh"
-              width={250}
-              height={250}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute bottom-0 left-0 bg-white bg-opacity-90 p-3">
-              <h3 className="text-lg font-bold text-black text-left">D.Scoriesh</h3>
-              <p className="text-sm text-gray-600 text-left">Assistant Chef</p>
-            </div>
-          </div>
-
-          {/* Chef 3 */}
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-lg relative overflow-hidden">
-            <Image
-              src="/Chef3.svg"
-              alt="M. William"
-              width={250}
-              height={250}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute bottom-0 left-0 bg-white bg-opacity-90 p-3 ">
-              <h3 className="text-lg font-bold text-black text-left">M. William</h3>
-              <p className="text-sm text-gray-600 text-left">Advertising Chef</p>
-            </div>
-          </div>
-
-          {/* Chef 4 */}
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/5 bg-white rounded-md shadow-lg relative overflow-hidden">
-            <Image
-              src="/Chef4.svg"
-              alt="W.Readfroad"
-              width={250}
-              height={250}
-              className="w-full h-auto object-cover"
-            />
-            <div className="absolute bottom-0 left-0 bg-white bg-opacity-90 p-3">
-              <h3 className="text-lg font-bold text-black text-left">W.Readfroad</h3>
-              <p className="text-sm text-gray-600 text-left">Chef</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Right side image */}

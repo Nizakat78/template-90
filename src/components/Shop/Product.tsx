@@ -1,10 +1,11 @@
-import { client, urlFor } from '../../lib/sanityClient';
-import { MdArrowCircleRight } from "react-icons/md";
-import { FaAnglesLeft } from "react-icons/fa6";
-import { FaAngleDoubleRight } from "react-icons/fa";
+"use client";
+import { useState, useEffect } from "react";
+import { client, urlFor } from "../../lib/sanityClient";
+import { useRouter } from "next/navigation";
 import { LiaSearchSolid } from "react-icons/lia";
+import { FaAnglesRight } from "react-icons/fa6";
+import { FaAnglesLeft } from "react-icons/fa6";
 
-// Define TypeScript type for Food data
 interface Food {
   _id: string;
   name: string;
@@ -12,7 +13,6 @@ interface Food {
   price: number;
   originalPrice?: number;
   tags?: string[];
-  description?: string;
   available: boolean;
   image?: {
     asset: {
@@ -21,31 +21,118 @@ interface Food {
   };
 }
 
-// Fetch food data from Sanity
-async function getFoods(): Promise<Food[]> {
-  const query = `*[_type == "food"]{
-    _id,
-    name,
-    category,
-    price,
-    originalPrice,
-    tags,
-    description,
-    available,
-    image {
-      asset -> {
-        _id,
-        url
-      }
-    }
-  }`;
-  const foods = await client.fetch(query);
-  return foods;
-}
+export default function FoodsPage() {
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [latestProducts, setLatestProducts] = useState<Food[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [tags, setTags] = useState<string[]>([]);
+  const itemsPerPage = 9;
 
-// Foods page component
-export default async function FoodsPage() {
-  const foods = await getFoods();
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchFoods = async () => {
+      const query = `*[_type == "food"]{
+        _id,
+        name,
+        category,
+        price,
+        originalPrice,
+        tags,
+        available,
+        image {
+          asset -> {
+            _id,
+            url
+          }
+        }
+      }`;
+      const fetchedFoods = await client.fetch(query);
+      setFoods(fetchedFoods);
+  
+      // Ensure allTags is typed as string[]
+      const allTags: string[] = fetchedFoods.flatMap((food) => food.tags || []);
+      const uniqueTags: string[] = Array.from(new Set(allTags));
+      setTags(uniqueTags);
+    };
+  
+    const fetchLatestProducts = async () => {
+      const query = `*[_type == "food"] | order(_createdAt desc) [0..3]{
+        _id,
+        name,
+        category,
+        price,
+        originalPrice,
+        tags,
+        available,
+        image {
+          asset -> {
+            _id,
+            url
+          }
+        }
+      }`;
+      const fetchedLatestProducts = await client.fetch(query);
+      setLatestProducts(fetchedLatestProducts);
+    };
+  
+    fetchFoods();
+    fetchLatestProducts();
+  }, []);
+  
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prevCategories) =>
+      prevCategories.includes(category)
+        ? prevCategories.filter((item) => item !== category)
+        : [...prevCategories, category]
+    );
+  };
+
+  const handleTagClick = (tag: string) => {
+    setSelectedTags((prevTags) =>
+      prevTags.includes(tag)
+        ? prevTags.filter((item) => item !== tag)
+        : [...prevTags, tag]
+    );
+  };
+
+  const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value);
+    setPriceRange([0, value]);
+  };
+
+  const handleProductClick = (id: string) => {
+    router.push(`/food/${id}`);
+  };
+
+  const filteredFoods = foods
+    .filter((food) => food.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(
+      (food) =>
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(food.category)
+    )
+    .filter(
+      (food) =>
+        selectedTags.length === 0 ||
+        (food.tags && food.tags.some((tag) => selectedTags.includes(tag)))
+    )
+    .filter((food) => food.price >= priceRange[0] && food.price <= priceRange[1]);
+
+  const totalPages = Math.ceil(filteredFoods.length / itemsPerPage);
+  const currentFoods = filteredFoods.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -53,20 +140,21 @@ export default async function FoodsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Products Grid */}
           <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {foods.map((food) => (
+            {currentFoods.map((food) => (
               <div
                 key={food._id}
-                className="bg-white shadow-md rounded-md overflow-hidden"
+                className="bg-white shadow-md rounded-md overflow-hidden cursor-pointer"
+                onClick={() => handleProductClick(food._id)}
               >
                 {food.image && food.image.asset ? (
                   <img
-                    src={urlFor(food.image).width(300).url()} // Generate image URL
+                    src={urlFor(food.image).width(300).url()}
                     alt={food.name}
                     className="w-full h-40 object-cover"
                   />
                 ) : (
                   <img
-                    src="/placeholder.jpg" // Fallback image
+                    src="/placeholder.jpg"
                     alt="Placeholder"
                     className="w-full h-40 object-cover"
                   />
@@ -86,7 +174,6 @@ export default async function FoodsPage() {
                   ) : (
                     <span className="text-sm text-red-500">Unavailable</span>
                   )}
-                  <p className="text-sm text-gray-500">{food.description}</p>
                 </div>
               </div>
             ))}
@@ -99,109 +186,121 @@ export default async function FoodsPage() {
                 type="text"
                 placeholder="Search here..."
                 className="w-full p-2 pl-10 border border-gray-300 rounded-md"
+                onChange={handleSearchChange}
               />
               <LiaSearchSolid className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500" />
             </div>
 
             <h3 className="text-lg font-bold mt-6 mb-4">Categories</h3>
             <ul>
-              {[
-                "Sandwiches",
-                "Burger",
-                "Chicken Chup",
-                "Drink",
-                "Pizza",
-                "Thi",
-                "Non Veg",
-                "Uncategorized",
-              ].map((category) => (
+              {["Sandwiches", "Burger", "Pizza", "Drink"].map((category) => (
                 <li key={category} className="mb-2">
                   <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" /> {category}
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(category)}
+                      onChange={() => handleCategoryChange(category)}
+                      className="mr-2"
+                    />
+                    {category}
                   </label>
                 </li>
               ))}
             </ul>
-
-            {/* Background with Text */}
-            <div
-              className="relative bg-cover bg-center rounded-md mb-4"
-              style={{ backgroundImage: "url('/Sidebar1.svg')", height: "300px" }}
-            >
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4">
-                <div className="text-white">
-                  <h4 className="text-2xl font-bold">Perfect Taste</h4>
-                  <p className="text-sm mt-2">Classic Restaurant</p>
-                  <p className="text-sm mt-2 text-yellow-600">45.00$</p>
-                  <p className="text-sm mt-28">
-                    Shop Now <span>
-                      <MdArrowCircleRight />
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <div>
               <h3 className="text-lg font-bold mb-4">Filter By Price</h3>
-              <input type="range" min="0" max="100" className="w-full" />
-              <p>From $0 to $8000</p>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={priceRange[1]}
+                onChange={handlePriceChange}
+                className="w-full"
+              />
+              <p>From ₹0 to ₹{priceRange[1]}</p>
             </div>
 
-            <div className="mt-6 gap-10">
-              <h1 className="text-xl font-bold">Latest Products</h1>
+            {/* Tags */}
+            <h3 className="text-lg font-bold mt-6 mb-4">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => handleTagClick(tag)}
+                  className={`text-xs rounded-full px-4 py-2 ${
+                    selectedTags.includes(tag)
+                      ? "bg-yellow-500 text-white"
+                      : "bg-yellow-200 text-yellow-800"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
 
-            {[...Array(4)].map((_, i) => (
-              <div
-                key={i}
-                className="flex items-start mb-4 bg-white shadow-md rounded-md overflow-hidden"
-              >
-                <img
-                  src={`/Sidebar2.svg`}
-                  alt={`Product ${i + 1}`}
-                  className="w-16 h-16 object-cover"
-                />
-                <div className="ml-4">
-                  <h5 className="font-semibold">{`Product ${i + 1}`}</h5>
-                  <p className="text-sm text-gray-600">
-                    {`Description for Product ${i + 1}`}
-                  </p>
-                  <span className="text-lg font-bold">${10 + i * 5}</span>
+            {/* Latest Products */}
+            <div className="mt-6">
+              <h3 className="text-lg font-bold mb-4">Latest Products</h3>
+              {latestProducts.map((product) => (
+                <div
+                  key={product._id}
+                  className="flex items-start mb-4 bg-white shadow-md rounded-md overflow-hidden cursor-pointer"
+                  onClick={() => handleProductClick(product._id)}
+                >
+                  {product.image && product.image.asset ? (
+                    <img
+                      src={urlFor(product.image).width(100).url()}
+                      alt={product.name}
+                      className="w-24 h-24 object-cover"
+                    />
+                  ) : (
+                    <img
+                      src="/placeholder.jpg"
+                      alt="Placeholder"
+                      className="w-24 h-24 object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h5 className="font-semibold">{product.name}</h5>
+                    <span className="text-lg font-bold">₹{product.price}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-
-            <div>
-              <div className="text-lg font-bold p-4">Product Tags</div>
-              <div className="m-2 gap-6">
-                <p>Service Our Menu Pizza</p>
-                <p>
-                  Cupcake <span className="text-yellow-600">Burger</span> Cookies
-                </p>
-                <p>Our Shop Tandoori Chicken</p>
-              </div>
+              ))}
             </div>
           </aside>
         </div>
 
-        {/* Pagination Buttons */}
+        {/* Pagination */}
         <div className="mt-8 flex justify-center gap-4">
-          <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
-            <FaAnglesLeft />
-          </button>
-          <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
-            1
-          </button>
-          <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
-            2
-          </button>
-          <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
-            3
-          </button>
-          <button className="px-4 py-2 bg-white text-yellow-500 rounded-md shadow-md border-yellow-500">
-            <FaAngleDoubleRight />
-          </button>
+          {currentPage > 1 && (
+            <button
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="p-2 bg-gray-200 rounded-full"
+            >
+              <FaAnglesLeft />
+            </button>
+          )}
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-4 py-2 rounded-md ${
+                currentPage === page
+                  ? "bg-yellow-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          {currentPage < totalPages && (
+            <button
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="p-2 bg-gray-200 rounded-full"
+            >
+              <FaAnglesRight />
+            </button>
+          )}
         </div>
       </div>
     </div>

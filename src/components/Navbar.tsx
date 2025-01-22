@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
+import { useCart } from "./hooks/useCart"; // Importing the custom hook
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { getTotalItems } = useCart(); // Using the hook to get the total items in the cart
 
   const handleMenuItemClick = () => {
     setIsMenuOpen(false); // Close the menu when a link is clicked
@@ -98,6 +100,12 @@ const Navbar: React.FC = () => {
               className="flex items-center justify-center text-yellow-400"
             >
               <MdOutlineShoppingCart className="w-6 h-6" />
+              {/* Cart item count for mobile */}
+              {getTotalItems() > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
             </button>
           </li>
           <li className="py-2 md:hidden">
@@ -126,9 +134,15 @@ const Navbar: React.FC = () => {
           </div>
           <button
             onClick={() => (window.location.href = "/Carts")}
-            className="flex items-center justify-center text-yellow-400"
+            className="relative flex items-center justify-center text-yellow-400"
           >
             <MdOutlineShoppingCart className="w-6 h-6" />
+            {/* Cart item count for desktop */}
+            {getTotalItems() > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {getTotalItems()}
+              </span>
+            )}
           </button>
           <Link href="/Login" className="text-sm hover:text-yellow-400">
             Login

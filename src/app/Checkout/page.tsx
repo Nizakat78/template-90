@@ -43,6 +43,14 @@ const CheckoutPage: React.FC = () => {
   const tax = subTotal * 0.1; // Assuming 10% tax
   const total = subTotal - discount + tax;
 
+  const handlePlaceOrder = () => {
+    // For now, just log the shipping details and cart
+    console.log("Shipping Details:", shippingDetails);
+    console.log("Cart Items:", cartItems);
+
+    // Here you would typically send this data to your backend or payment processor
+  };
+
   return (
     <div className="p-6 bg-black text-white min-h-screen">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -145,7 +153,7 @@ const CheckoutPage: React.FC = () => {
               <div key={item._id} className="flex justify-between items-center mb-2">
                 <div>
                   <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm text-gray-400">{item.weight}</p>
+                  <p className="text-sm text-gray-400">{item.image}</p>
                 </div>
                 <p>{item.quantity} x ₹{item.price}</p>
               </div>
@@ -178,7 +186,12 @@ const CheckoutPage: React.FC = () => {
         <Link href="/Carts">
           <button className="px-4 py-2 bg-gray-700 text-white rounded">Back to cart</button>
         </Link>
-        <button className="px-4 py-2 bg-orange-500 text-white rounded">Place an order</button>
+        <button
+          onClick={handlePlaceOrder}
+          className="px-4 py-2 bg-orange-500 text-white rounded"
+        >
+          Place an order
+        </button>
       </div>
     </div>
   );

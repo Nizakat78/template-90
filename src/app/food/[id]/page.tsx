@@ -189,4 +189,4 @@ export default function FoodDetailsPage() {
       </div>
     </div>
   );
-}
+} 

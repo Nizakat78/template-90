@@ -38,18 +38,26 @@ const CheckoutPage: React.FC = () => {
     setShippingDetails((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePlaceOrder = () => {
+    // Here you can send `shippingDetails` and `cartItems` to your backend API
+    console.log("Shipping Details:", shippingDetails);
+    console.log("Cart Items:", cartItems);
+
+    // Example API call:
+    // fetch('/api/place-order', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ shippingDetails, cartItems }),
+    // })
+    //   .then(response => response.json())
+    //   .then(data => console.log('Order placed successfully', data))
+    //   .catch(error => console.error('Error placing order:', error));
+  };
+
   const subTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const discount = subTotal * 0.25;
   const tax = subTotal * 0.1; // Assuming 10% tax
   const total = subTotal - discount + tax;
-
-  const handlePlaceOrder = () => {
-    // For now, just log the shipping details and cart
-    console.log("Shipping Details:", shippingDetails);
-    console.log("Cart Items:", cartItems);
-
-    // Here you would typically send this data to your backend or payment processor
-  };
 
   return (
     <div className="p-6 bg-black text-white min-h-screen">
@@ -107,7 +115,6 @@ const CheckoutPage: React.FC = () => {
               <option value="">Choose country</option>
               <option value="USA">USA</option>
               <option value="India">India</option>
-              {/* Add more countries */}
             </select>
             <select
               name="city"
@@ -117,7 +124,6 @@ const CheckoutPage: React.FC = () => {
               <option value="">Choose city</option>
               <option value="New York">New York</option>
               <option value="Delhi">Delhi</option>
-              {/* Add more cities */}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -151,9 +157,15 @@ const CheckoutPage: React.FC = () => {
           <div className="mb-4">
             {cartItems.map((item) => (
               <div key={item._id} className="flex justify-between items-center mb-2">
-                <div>
-                  <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm text-gray-400">{item.image}</p>
+                <div className="flex items-center">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded mr-4"
+                  />
+                  <div>
+                    <p className="font-semibold">{item.name}</p>
+                  </div>
                 </div>
                 <p>{item.quantity} x ₹{item.price}</p>
               </div>

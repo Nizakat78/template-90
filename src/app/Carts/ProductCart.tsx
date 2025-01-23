@@ -16,12 +16,16 @@ const ProductCart: React.FC = () => {
   // Load cart from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
-    if (storedCart) setProducts(JSON.parse(storedCart));
-  }, []);
+    if (storedCart) {
+      setProducts(JSON.parse(storedCart));
+    }
+  }, []);  // Ensure it loads only once when the component is mounted
 
-  // Save cart to localStorage when products change
+  // Save cart to localStorage whenever products change
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(products));
+    if (products.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(products));
+    }
   }, [products]);
 
   const handleRemoveProduct = (id: string) => {

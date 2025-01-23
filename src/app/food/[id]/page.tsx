@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { client, urlFor } from "../../../lib/sanityClient";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
+import { useCart } from "../../../app/Context/Cartcontext"; // Import the useCart hook
 
 interface FoodDetails {
   _id: string;
@@ -28,6 +29,7 @@ export default function FoodDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1); // For quantity of food item
   const router = useRouter();
+  const { addToCart } = useCart(); // Access addToCart from context
 
   useEffect(() => {
     const fetchFoodDetails = async () => {
@@ -67,28 +69,20 @@ export default function FoodDetailsPage() {
     if (food) {
       const item = {
         ...food,
-        quantity: quantity,
-        image: food.image?.asset?.url || "/placeholder.jpg", // Save image URL
+        quantity,
+        image: food.image?.asset?.url || "/placeholder.jpg", // Use the image URL
       };
 
-      // Save to localStorage
-      const existingCart = localStorage.getItem("cart");
-      const updatedCart = existingCart ? JSON.parse(existingCart) : [];
-      updatedCart.push(item);
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      addToCart(item); // Add the item using the global context
 
       alert(`${food.name} has been added to the cart!`);
     }
   };
 
-  const increaseQuantity = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
-  };
+  const increaseQuantity = () => setQuantity((prevQuantity) => prevQuantity + 1);
 
   const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
-    }
+    if (quantity > 1) setQuantity((prevQuantity) => prevQuantity - 1);
   };
 
   if (loading) {

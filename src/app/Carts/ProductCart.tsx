@@ -3,113 +3,123 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   image: string;
   price: number;
-  rating: number;
   quantity: number;
 }
 
 const ProductCart: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [coupon, setCoupon] = useState("");
-  const [shippingCharge] = useState(0);
 
-  // Fetch the cart from localStorage when the component mounts
+  // Load cart from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setProducts(JSON.parse(storedCart));
-    }
+    if (storedCart) setProducts(JSON.parse(storedCart));
   }, []);
 
-  // Handle the removal of a product
+  // Save cart to localStorage when products change
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(products));
+  }, [products]);
+
   const handleRemoveProduct = (id: string) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
+    const updatedProducts = products.filter((product) => product._id !== id);
     setProducts(updatedProducts);
-    localStorage.setItem("cart", JSON.stringify(updatedProducts));
+    localStorage.setItem("cart", JSON.stringify(updatedProducts)); // Sync with localStorage
   };
 
-  // Calculate the cart subtotal
   const cartSubtotal = products.reduce(
     (total, product) => total + product.price * product.quantity,
     0
   );
 
   return (
-    <div className="p-4 bg-white text-black min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <table className="w-full table-auto border-collapse">
-          <thead>
-            <tr className="text-left border-b border-gray-700">
-              <th className="py-3">Product</th>
-              <th>Price</th>
-              <th>Total</th>
-              <th>Remove</th>
-            </tr>
-          </thead>
-          <tbody>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6 text-center">Your Cart</h1>
+
+        {products.length === 0 ? (
+          <div className="text-center">
+            <p className="text-gray-600 text-lg">Your cart is empty!</p>
+            <Link href="/">
+              <button className="mt-6 px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600">
+                Continue Shopping
+              </button>
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-white shadow-md rounded-lg p-6">
             {products.map((product) => (
-              <tr key={product.id} className="border-b border-gray-700">
-                <td className="py-3 flex items-center gap-3">
+              <div
+                key={product._id}
+                className="flex flex-col md:flex-row items-center justify-between gap-6 border-b pb-4 mb-4"
+              >
+                {/* Product Image */}
+                <div className="flex items-center gap-4 w-full md:w-1/3">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
+                    className="w-20 h-20 object-cover rounded-lg"
                   />
-                  <div>
-                    <p>{product.name}</p>
-                  </div>
-                </td>
-                <td>₹{product.price}</td>
-                <td>₹{(product.price * product.quantity).toFixed(2)}</td>
-                <td>
+                  <p className="font-medium text-lg">{product.name}</p>
+                </div>
+
+                {/* Product Details */}
+                <div className="w-full md:w-2/3 flex justify-between items-center gap-6">
+                  <p className="text-gray-700 text-sm">
+                    Price:{" "}
+                    <span className="font-semibold text-lg">
+                      ₹{product.price}
+                    </span>
+                  </p>
+                  <p className="text-gray-700 text-sm">
+                    Quantity:{" "}
+                    <span className="font-semibold text-lg">
+                      {product.quantity}
+                    </span>
+                  </p>
+                  <p className="text-gray-700 text-sm">
+                    Total:{" "}
+                    <span className="font-semibold text-lg">
+                      ₹{(product.price * product.quantity).toFixed(2)}
+                    </span>
+                  </p>
+                  {/* Remove Button */}
                   <button
-                    onClick={() => handleRemoveProduct(product.id)}
-                    className="text-red-500"
+                    onClick={() => handleRemoveProduct(product._id)}
+                    className="text-red-500 hover:text-red-700 font-bold text-lg"
                   >
                     ✕
                   </button>
-                </td>
-              </tr>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
 
-        {/* Coupon Section */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="p-4 border border-gray-300 rounded">
-            <h2 className="text-lg font-semibold mb-2">Coupon Code</h2>
-            <input
-              type="text"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              placeholder="Enter coupon code"
-              className="px-4 py-2 border border-gray-300 rounded"
-            />
-          </div>
-
-          {/* Total Section */}
-          <div className="p-4 border border-gray-300 rounded">
-            <h2 className="text-lg font-semibold mb-2">Total Bill</h2>
-            <div className="flex justify-between mb-2">
-              <span>Cart Subtotal</span>
-              <span>₹{cartSubtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-semibold text-lg">
-              <span>Total Amount</span>
-              <span>₹{(cartSubtotal + shippingCharge).toFixed(2)}</span>
+            {/* Subtotal and Checkout */}
+            <div className="mt-6">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-lg font-semibold">
+                  Subtotal:{" "}
+                  <span className="text-yellow-500 font-bold">
+                    ₹{cartSubtotal.toFixed(2)}
+                  </span>
+                </p>
+                <Link href="/Checkout">
+                  <button className="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600">
+                    Proceed to Checkout
+                  </button>
+                </Link>
+              </div>
+              <Link href="/Shop">
+                <button className="w-full py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
+                  Continue Buying Food
+                </button>
+              </Link>
             </div>
           </div>
-        </div>
-
-        {/* Proceed to Checkout */}
-        <Link href="/Checkout">
-          <button className="w-full mt-4 py-3 bg-orange-500 text-white text-center text-lg font-semibold rounded">
-            Proceed to Checkout
-          </button>
-        </Link>
+        )}
       </div>
     </div>
   );

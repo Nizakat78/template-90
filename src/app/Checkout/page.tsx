@@ -1,9 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
+interface CartItem {
+  _id: string;
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+}
+
 const CheckoutPage: React.FC = () => {
-  const [, setShippingDetails] = useState({
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [shippingDetails, setShippingDetails] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -16,20 +25,18 @@ const CheckoutPage: React.FC = () => {
     address2: "",
   });
 
+  // Load cart items from localStorage
+  useEffect(() => {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setShippingDetails((prev) => ({ ...prev, [name]: value }));
   };
-
-  const cartItems = [
-    {
-      id: 1,
-      name: "Chicken Tikka Kabab",
-      quantity: 3,
-      price: 50,
-      weight: "150 gm net",
-    },
-  ];
 
   const subTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   const discount = subTotal * 0.25;
@@ -135,18 +142,18 @@ const CheckoutPage: React.FC = () => {
           <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
           <div className="mb-4">
             {cartItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center mb-2">
+              <div key={item._id} className="flex justify-between items-center mb-2">
                 <div>
                   <p className="font-semibold">{item.name}</p>
                   <p className="text-sm text-gray-400">{item.weight}</p>
                 </div>
-                <p>{item.quantity} x ${item.price.toFixed(2)}</p>
+                <p>{item.quantity} x ₹{item.price}</p>
               </div>
             ))}
           </div>
           <div className="flex justify-between mb-2">
             <span>Sub-total</span>
-            <span>${subTotal.toFixed(2)}</span>
+            <span>₹{subTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between mb-2">
             <span>Shipping</span>
@@ -158,18 +165,18 @@ const CheckoutPage: React.FC = () => {
           </div>
           <div className="flex justify-between mb-4">
             <span>Tax</span>
-            <span>${tax.toFixed(2)}</span>
+            <span>₹{tax.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-semibold text-lg">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>₹{total.toFixed(2)}</span>
           </div>
         </div>
       </div>
 
       <div className="flex justify-between mt-6">
         <Link href="/Carts">
-        <button className="px-4 py-2 bg-gray-700 text-white rounded">Back to cart</button>
+          <button className="px-4 py-2 bg-gray-700 text-white rounded">Back to cart</button>
         </Link>
         <button className="px-4 py-2 bg-orange-500 text-white rounded">Place an order</button>
       </div>

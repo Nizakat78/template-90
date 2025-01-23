@@ -202,7 +202,7 @@ const CheckoutPage: React.FC = () => {
           onClick={handlePlaceOrder}
           className="px-4 py-2 bg-orange-500 text-white rounded"
         >
-          Place an order
+         Go Place an order
         </button>
       </div>
     </div>

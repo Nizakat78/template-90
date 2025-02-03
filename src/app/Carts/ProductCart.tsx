@@ -1,6 +1,8 @@
-"use client";
+"use client"
 import React, { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 interface Product {
   _id: string;
@@ -12,14 +14,16 @@ interface Product {
 
 const ProductCart: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { user } = useUser(); // Fetch the logged-in user details
 
-  // Load cart from localStorage
+  // Load cart from localStorage when component mounts
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
       setProducts(JSON.parse(storedCart));
     }
-  }, []);  // Ensure it loads only once when the component is mounted
+  }, []);
 
   // Save cart to localStorage whenever products change
   useEffect(() => {
@@ -31,7 +35,7 @@ const ProductCart: React.FC = () => {
   const handleRemoveProduct = (id: string) => {
     const updatedProducts = products.filter((product) => product._id !== id);
     setProducts(updatedProducts);
-    localStorage.setItem("cart", JSON.stringify(updatedProducts)); // Sync with localStorage
+    localStorage.setItem("cart", JSON.stringify(updatedProducts));
   };
 
   const cartSubtotal = products.reduce(
@@ -110,12 +114,24 @@ const ProductCart: React.FC = () => {
                     ₹{cartSubtotal.toFixed(2)}
                   </span>
                 </p>
-                <Link href="/Checkout">
-                  <button className="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600">
-                    Proceed to Checkout
-                  </button>
-                </Link>
+
+                {/* Clerk Authentication Check for Checkout */}
+                <SignedIn>
+                  <Link href="/Checkout">
+                    <button className="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600">
+                      Proceed to Checkout
+                    </button>
+                  </Link>
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <button className="px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500">
+                      Sign In to Checkout
+                    </button>
+                  </SignInButton>
+                </SignedOut>
               </div>
+
               <Link href="/Shop">
                 <button className="w-full py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300">
                   Continue Buying Food

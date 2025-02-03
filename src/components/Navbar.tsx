@@ -1,17 +1,18 @@
 "use client";
-
 import React, { useState } from "react";
 import Link from "next/link";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
-import { useCart } from "../app/Context/Cartcontext"; // Using the CartContext hook
+import { CgProfile } from "react-icons/cg";
+import { useCart } from "../app/Context/Cartcontext";
+import { SignInButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs"; // Clerk Authentication
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { cartCount } = useCart(); // Using cartCount from the CartContext
+  const { cartCount } = useCart();
 
   const handleMenuItemClick = () => {
-    setIsMenuOpen(false); // Close the menu when a link is clicked
+    setIsMenuOpen(false); // Close the menu after clicking a link
   };
 
   return (
@@ -25,7 +26,7 @@ const Navbar: React.FC = () => {
           </Link>
         </div>
 
-        {/* Mobile Hamburger Icon */}
+        {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -54,74 +55,73 @@ const Navbar: React.FC = () => {
             isMenuOpen ? "block" : "hidden"
           }`}
         >
-          <li className="py-2 md:py-0">
-            <Link href="/" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Home
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/Menu" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Menu
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/Blog" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Blog
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/FAQpage" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Pages
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/About" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              About
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/Shop" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Shop
-            </Link>
-          </li>
-          <li className="py-2 md:py-0">
-            <Link href="/Contact" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Contact
-            </Link>
-          </li>
+          {["Home", "Menu", "Blog", "Pages", "About", "Shop", "Contact"].map(
+            (item) => (
+              <li key={item} className="py-2 md:py-0">
+                <Link
+                  href={item === "Home" ? "/" : `/${item}`}
+                  onClick={handleMenuItemClick}
+                  className="hover:text-yellow-400"
+                >
+                  {item}
+                </Link>
+              </li>
+            )
+          )}
 
-          {/* Mobile-specific: Cart, Login, Sign Up */}
-          <li className="flex justify-center py-2 md:hidden">
+          {/* Search, Cart, and Profile Icons */}
+          <div className="flex flex-col items-center space-y-4 py-4 md:hidden">
+            {/* Search Icon */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="bg-gray-800 border border-black text-sm text-white rounded-full px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-yellow-400"
+              />
+              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-yellow-400">
+                <FaSearch className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Cart Icon */}
             <button
-              onClick={() => {
-                window.location.href = "/Carts";
-                handleMenuItemClick();
-              }}
-              className="flex items-center justify-center text-yellow-400"
+              onClick={() => (window.location.href = "/Carts")}
+              className="relative flex items-center justify-center text-yellow-400 hover:text-yellow-500 transition duration-200"
             >
-              <MdOutlineShoppingCart className="w-6 h-6" />
-              {/* Cart item count for mobile */}
+              <MdOutlineShoppingCart className="w-7 h-7" />
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </button>
-          </li>
-          <li className="py-2 md:hidden">
-            <Link href="/Login" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Login
-            </Link>
-          </li>
-          <li className="py-2 md:hidden">
-            <Link href="/Signup" onClick={handleMenuItemClick} className="hover:text-yellow-400">
-              Sign Up
-            </Link>
-          </li>
+
+            {/* Profile Icon */}
+            <div className="relative">
+              <SignedIn>
+                <UserButton />
+                {/* Add User History Link for signed-in users */}
+                <Link
+                  href="/user-history"
+                  className="text-yellow-400 hover:text-yellow-500 mt-2"
+                >
+                  User History
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="text-yellow-400 hover:text-yellow-500 transition duration-200 p-2 rounded-full bg-gray-700 hover:bg-gray-600">
+                    <CgProfile className="w-6 h-6" />
+                  </button>
+                </SignInButton>
+              </SignedOut>
+            </div>
+          </div>
         </ul>
 
-        {/* Search and Icons for Desktop */}
-        <div className="hidden md:flex items-center space-x-4">
+        {/* Desktop Version of the Icons */}
+        <div className="hidden md:flex items-center space-x-6">
+          {/* Search Icon */}
           <div className="relative">
             <input
               type="text"
@@ -129,37 +129,45 @@ const Navbar: React.FC = () => {
               className="bg-gray-800 border border-black text-sm text-white rounded-full px-4 py-2 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-yellow-400"
             />
             <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-yellow-400">
-              <FaSearch />
+              <FaSearch className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Cart Icon */}
           <button
             onClick={() => (window.location.href = "/Carts")}
-            className="relative flex items-center justify-center text-yellow-400"
+            className="relative flex items-center justify-center text-yellow-400 hover:text-yellow-500 transition duration-200"
           >
-            <MdOutlineShoppingCart className="w-6 h-6" />
-            {/* Cart item count for desktop */}
+            <MdOutlineShoppingCart className="w-7 h-7" />
             {cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
           </button>
-          <Link href="/Login" className="text-sm hover:text-yellow-400">
-            Login
-          </Link>
-          <Link href="/Signup" className="text-sm hover:text-yellow-400">
-            Sign Up
-          </Link>
+
+          {/* Profile Icon */}
+          <div className="relative">
+            <SignedIn>
+              <UserButton />
+              {/* Add User History Link for signed-in users */}
+              <Link
+                href="/order-history"
+                className="text-yellow-400 hover:text-yellow-500 ml-4"
+              >
+                User History
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="text-yellow-400 hover:text-yellow-500 transition duration-200 p-2 rounded-full bg-gray-700 hover:bg-gray-600">
+                  <CgProfile className="w-6 h-6" />
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </div>
         </div>
       </div>
-
-      {/* Mobile Overlay for Menu */}
-      {isMenuOpen && (
-        <div
-          onClick={() => setIsMenuOpen(false)}
-          className="fixed inset-0 bg-black opacity-50 z-0"
-        ></div>
-      )}
     </nav>
   );
 };

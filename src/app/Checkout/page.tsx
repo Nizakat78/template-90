@@ -1,6 +1,8 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import { useUser } from "@clerk/nextjs"; // Import Clerk's useUser hook
+import { useRouter } from "next/navigation"; // For routing after placing order
 
 interface CartItem {
   _id: string;
@@ -11,7 +13,10 @@ interface CartItem {
 }
 
 const CheckoutPage: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { user } = useUser(); // Get the logged-in user details
+  const router = useRouter();
+
+  const [cartItems, setCartItems] = useState<CartItem[]>([]); // State to hold cart items
   const [shippingDetails, setShippingDetails] = useState({
     firstName: "",
     lastName: "",
@@ -24,61 +29,123 @@ const CheckoutPage: React.FC = () => {
     address1: "",
     address2: "",
   });
+  const [errors, setErrors] = useState<string[]>([]); // Track validation errors
+  const [isLoading, setIsLoading] = useState(false); // Track loading state
 
-  // Load cart items from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+      setCartItems(JSON.parse(storedCart)); // Load cart from localStorage
+    } else {
+      router.push("/cart"); // If no items in the cart, redirect to cart page
     }
-  }, []);
+  }, [router]);
 
+  // Handle input changes for shipping details
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setShippingDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePlaceOrder = () => {
-    // Here you can send `shippingDetails` and `cartItems` to your backend API
-    console.log("Shipping Details:", shippingDetails);
-    console.log("Cart Items:", cartItems);
+  // Validate form fields before placing order
+  const validateForm = () => {
+    const requiredFields = ["firstName", "lastName", "email", "phone", "country", "city", "zipCode", "address1"];
+    const missingFields = requiredFields.filter((field) => !shippingDetails[field]);
 
-    // Example API call:
-    // fetch('/api/place-order', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ shippingDetails, cartItems }),
-    // })
-    //   .then(response => response.json())
-    //   .then(data => console.log('Order placed successfully', data))
-    //   .catch(error => console.error('Error placing order:', error));
+    if (missingFields.length > 0) {
+      setErrors(missingFields);
+      return false;
+    }
+    setErrors([]);
+    return true;
   };
 
+  // Calculate subtotal, discount, tax, and total
   const subTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const discount = subTotal * 0.25;
+  const discount = subTotal * 0.25; // Assuming 25% discount
   const tax = subTotal * 0.1; // Assuming 10% tax
   const total = subTotal - discount + tax;
+
+  // Place the order by sending data to the backend API
+  const handlePlaceOrder = async () => {
+    if (!validateForm()) return;
+
+    if (!user) {
+      console.log("User not logged in");
+      return;
+    }
+
+    const orderData = {
+      userId: user.id, // Pass Clerk userId
+      customerName: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
+      email: shippingDetails.email,
+      phone: shippingDetails.phone,
+      address: `${shippingDetails.address1}, ${shippingDetails.city}, ${shippingDetails.country} - ${shippingDetails.zipCode}`,
+      items: cartItems.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total,
+    };
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/createOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      setIsLoading(false);
+
+      if (response.ok) {
+        const responseData = await response.json();
+        const orderId = responseData.orderId; // Extract orderId from the response
+
+        // Clear cart and redirect to payment page
+        localStorage.removeItem("cart");
+        router.push(`/payment?total=${total.toFixed(2)}&orderId=${orderId}`); // Include orderId in the URL
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to place order", errorData.message || "Unknown error");
+        setErrors([errorData.message || "Failed to place order"]);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error placing order", error);
+      setErrors(["Error placing order. Please try again."]);
+    }
+  };
 
   return (
     <div className="p-6 bg-black text-white min-h-screen">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Shipping Address */}
+        {/* Shipping Address Form */}
         <div className="p-4 border border-gray-600 rounded">
           <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
+          {errors.length > 0 && (
+            <div className="text-red-500 mb-4">
+              <p>{errors.join(", ")}</p>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4 mb-4">
             <input
               type="text"
               name="firstName"
               placeholder="First name"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("firstName") ? "border-red-500" : "border-gray-700"}`}
             />
             <input
               type="text"
               name="lastName"
               placeholder="Last name"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("lastName") ? "border-red-500" : "border-gray-700"}`}
             />
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -87,30 +154,21 @@ const CheckoutPage: React.FC = () => {
               name="email"
               placeholder="Email address"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("email") ? "border-red-500" : "border-gray-700"}`}
             />
             <input
               type="text"
               name="phone"
               placeholder="Phone number"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
-            />
-          </div>
-          <div className="mb-4">
-            <input
-              type="text"
-              name="company"
-              placeholder="Company"
-              onChange={handleInputChange}
-              className="p-2 w-full border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("phone") ? "border-red-500" : "border-gray-700"}`}
             />
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <select
               name="country"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("country") ? "border-red-500" : "border-gray-700"}`}
             >
               <option value="">Choose country</option>
               <option value="USA">USA</option>
@@ -119,7 +177,7 @@ const CheckoutPage: React.FC = () => {
             <select
               name="city"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("city") ? "border-red-500" : "border-gray-700"}`}
             >
               <option value="">Choose city</option>
               <option value="New York">New York</option>
@@ -132,20 +190,20 @@ const CheckoutPage: React.FC = () => {
               name="zipCode"
               placeholder="Zip code"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("zipCode") ? "border-red-500" : "border-gray-700"}`}
             />
             <input
               type="text"
               name="address1"
               placeholder="Address 1"
               onChange={handleInputChange}
-              className="p-2 border border-gray-700 rounded bg-black text-white"
+              className={`p-2 border rounded bg-black text-white ${errors.includes("address1") ? "border-red-500" : "border-gray-700"}`}
             />
           </div>
           <input
             type="text"
             name="address2"
-            placeholder="Address 2"
+            placeholder="Address 2 (optional)"
             onChange={handleInputChange}
             className="p-2 w-full border border-gray-700 rounded bg-black text-white"
           />
@@ -158,11 +216,7 @@ const CheckoutPage: React.FC = () => {
             {cartItems.map((item) => (
               <div key={item._id} className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded mr-4"
-                  />
+                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded mr-4" />
                   <div>
                     <p className="font-semibold">{item.name}</p>
                   </div>
@@ -194,15 +248,20 @@ const CheckoutPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex justify-between mt-6">
-        <Link href="/Carts">
-          <button className="px-4 py-2 bg-gray-700 text-white rounded">Back to cart</button>
-        </Link>
+        <button
+          onClick={() => router.push("/cart")}
+          className="px-4 py-2 bg-gray-700 text-white rounded"
+        >
+          Back to Cart
+        </button>
         <button
           onClick={handlePlaceOrder}
-          className="px-4 py-2 bg-orange-500 text-white rounded"
+          className={`px-4 py-2 text-white rounded ${isLoading ? 'bg-gray-500' : 'bg-yellow-500'}`}
+          disabled={isLoading}
         >
-         Place an order
+          {isLoading ? 'Placing order...' : 'Place Order'}
         </button>
       </div>
     </div>

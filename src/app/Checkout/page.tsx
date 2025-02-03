@@ -108,7 +108,7 @@ const CheckoutPage: React.FC = () => {
 
         // Clear cart and redirect to payment page
         localStorage.removeItem("cart");
-        router.push(`/payment?total=${total.toFixed(2)}&orderId=${orderId}`); // Include orderId in the URL
+        router.push(`/payment/[id]?total=${total.toFixed(2)}&orderId=${orderId}`); // Include orderId in the URL
       } else {
         const errorData = await response.json();
         console.error("Failed to place order", errorData.message || "Unknown error");
@@ -251,7 +251,7 @@ const CheckoutPage: React.FC = () => {
       {/* Action Buttons */}
       <div className="flex justify-between mt-6">
         <button
-          onClick={() => router.push("/cart")}
+          onClick={() => router.push("/Carts")}
           className="px-4 py-2 bg-gray-700 text-white rounded"
         >
           Back to Cart

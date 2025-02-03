@@ -72,7 +72,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ total, orderId }) => {
     setIsProcessing(false);
 
     // Redirect to the order confirmation page with orderId and total
-    router.push(`/order-confirmation?orderId=${orderId}&total=${total}`);
+    router.push(`/order-confirmation/[id]?orderId=${orderId}&total=${total}`);
   };
 
   return (

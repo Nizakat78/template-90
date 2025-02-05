@@ -51,11 +51,11 @@ export default function FoodDetailsPage() {
       }`;
 
       try {
-        const fetchedFood = await client.fetch(query, { id });
+        const fetchedFood = await client.fetch(query, { id }, { cache: "force-cache" }); // 🚀 Fast fetch with caching
         setFood(fetchedFood);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching food details:", error);
+      } finally {
         setLoading(false);
       }
     };
@@ -119,6 +119,7 @@ export default function FoodDetailsPage() {
                 src={urlFor(food.image).width(500).url()}
                 alt={food.name}
                 className="rounded-md w-full h-auto"
+                loading="lazy" // 🚀 Faster image loading
               />
             ) : (
               <img
@@ -139,11 +140,11 @@ export default function FoodDetailsPage() {
             <div className="flex items-center mb-4">
               {food.originalPrice && (
                 <span className="text-gray-500 line-through mr-2">
-                  ₹{food.originalPrice}
+                  ${food.originalPrice}
                 </span>
               )}
               <span className="text-3xl font-bold text-yellow-500">
-                ₹{food.price}
+                ${food.price}
               </span>
             </div>
 
@@ -189,4 +190,4 @@ export default function FoodDetailsPage() {
       </div>
     </div>
   );
-} 
+}

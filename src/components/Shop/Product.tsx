@@ -164,10 +164,10 @@ export default function FoodsPage() {
                   <div className="flex items-center justify-between mt-2">
                     {food.originalPrice && (
                       <span className="text-gray-500 line-through">
-                        ₹{food.originalPrice}
+                        ${food.originalPrice}
                       </span>
                     )}
-                    <span className="text-xl font-bold">₹{food.price}</span>
+                    <span className="text-xl font-bold">${food.price}</span>
                   </div>
                   {food.available ? (
                     <span className="text-sm text-green-500">Available</span>
@@ -217,7 +217,7 @@ export default function FoodsPage() {
                 onChange={handlePriceChange}
                 className="w-full"
               />
-              <p>From ₹0 to ₹{priceRange[1]}</p>
+              <p>From $0 to ${priceRange[1]}</p>
             </div>
 
             {/* Tags */}
@@ -262,7 +262,7 @@ export default function FoodsPage() {
                   )}
                   <div className="p-4">
                     <h5 className="font-semibold">{product.name}</h5>
-                    <span className="text-lg font-bold">₹{product.price}</span>
+                    <span className="text-lg font-bold">${product.price}</span>
                   </div>
                 </div>
               ))}

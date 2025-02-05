@@ -102,7 +102,7 @@ const Navbar: React.FC = () => {
                 <UserButton />
                 {/* Add User History Link for signed-in users */}
                 <Link
-                  href="/user-history"
+                  href="/order-history"
                   className="text-yellow-400 hover:text-yellow-500 mt-2"
                 >
                   User History

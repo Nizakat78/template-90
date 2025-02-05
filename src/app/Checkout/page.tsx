@@ -85,6 +85,7 @@ const CheckoutPage: React.FC = () => {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
+        image: item.image,
       })),
       total,
     };
@@ -216,18 +217,19 @@ const CheckoutPage: React.FC = () => {
             {cartItems.map((item) => (
               <div key={item._id} className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
+                  
                   <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded mr-4" />
                   <div>
                     <p className="font-semibold">{item.name}</p>
                   </div>
                 </div>
-                <p>{item.quantity} x ₹{item.price}</p>
+                <p>{item.quantity} x ${item.price}</p>
               </div>
             ))}
           </div>
           <div className="flex justify-between mb-2">
             <span>Sub-total</span>
-            <span>₹{subTotal.toFixed(2)}</span>
+            <span>${subTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between mb-2">
             <span>Shipping</span>
@@ -239,11 +241,11 @@ const CheckoutPage: React.FC = () => {
           </div>
           <div className="flex justify-between mb-4">
             <span>Tax</span>
-            <span>₹{tax.toFixed(2)}</span>
+            <span>${tax.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-semibold text-lg">
             <span>Total</span>
-            <span>₹{total.toFixed(2)}</span>
+            <span>${total.toFixed(2)}</span>
           </div>
         </div>
       </div>

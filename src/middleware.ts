@@ -4,9 +4,10 @@ export default clerkMiddleware();
 
 export const config = {
   matcher: [
-    // Protect all routes except Next.js internals and static files
-    '/Checkout',
-    // Always protect API routes
-    '/(api|trpc)(.*)',
+    '/Checkout',             // Protect Checkout page
+    '/order-confirmation',    // Protect Order Confirmation page
+    '/order-history',         // Protect Order History page
+    '/payment',               // Protect Payment page
+    '/(api|trpc)(.*)',        // Protect all API routes
   ],
 };

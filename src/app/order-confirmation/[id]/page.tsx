@@ -76,7 +76,18 @@ const OrderConfirmation = () => {
       <ul className="list-none mt-4">
         {items?.map((item: any, index: number) => (
           <li key={index} className="mt-2">
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
+              {/* Displaying the item image if available */}
+              {item.image ? (
+                <img
+                  src={item.image}  // Ensure the image URL is available
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded mr-4"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gray-500 rounded mr-4">No Image</div>
+              )}
+              
               <span>{item.quantity}x {item.name}</span>
               <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>

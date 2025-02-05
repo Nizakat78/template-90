@@ -79,7 +79,7 @@ const ProductCart: React.FC = () => {
                   <p className="text-gray-700 text-sm">
                     Price:{" "}
                     <span className="font-semibold text-lg">
-                      ₹{product.price}
+                      ${product.price}
                     </span>
                   </p>
                   <p className="text-gray-700 text-sm">
@@ -91,7 +91,7 @@ const ProductCart: React.FC = () => {
                   <p className="text-gray-700 text-sm">
                     Total:{" "}
                     <span className="font-semibold text-lg">
-                      ₹{(product.price * product.quantity).toFixed(2)}
+                      ${(product.price * product.quantity).toFixed(2)}
                     </span>
                   </p>
                   {/* Remove Button */}
@@ -111,7 +111,7 @@ const ProductCart: React.FC = () => {
                 <p className="text-lg font-semibold">
                   Subtotal:{" "}
                   <span className="text-yellow-500 font-bold">
-                    ₹{cartSubtotal.toFixed(2)}
+                    ${cartSubtotal.toFixed(2)}
                   </span>
                 </p>
 

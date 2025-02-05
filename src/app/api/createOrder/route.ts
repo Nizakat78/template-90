@@ -44,6 +44,7 @@ export async function POST(req: Request) {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
+        image: item.image,
       })),
       total,
       status: "pending", // Initial status set to "pending"

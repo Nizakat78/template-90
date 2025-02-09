@@ -3,11 +3,7 @@ export const orderItem = {
     title: 'Order Item',
     type: 'object',
     fields: [
-      {
-        name: 'productId',
-        title: 'Product ID',
-        type: 'string',
-      },
+     
       {
         name: 'name',
         title: 'Name',
@@ -23,6 +19,13 @@ export const orderItem = {
         title: 'Quantity',
         type: 'number',
       },
+      {
+        name: 'image',  // Image field for the item
+        title: 'Image',
+        type: 'string',  // URL of the image
+        description: 'URL of the product image',
+      },
+    
     ],
   };
   

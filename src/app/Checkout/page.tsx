@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs"; // Import Clerk's useUser hook
 import { useRouter } from "next/navigation"; // For routing after placing order
@@ -77,10 +76,6 @@ const CheckoutPage: React.FC = () => {
 
     const orderData = {
       userId: user.id, // Pass Clerk userId
-      customerName: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
-      email: shippingDetails.email,
-      phone: shippingDetails.phone,
-      address: `${shippingDetails.address1}, ${shippingDetails.city}, ${shippingDetails.country} - ${shippingDetails.zipCode}`,
       items: cartItems.map((item) => ({
         name: item.name,
         quantity: item.quantity,
@@ -88,7 +83,21 @@ const CheckoutPage: React.FC = () => {
         image: item.image,
       })),
       total,
+      shippingDetails: {
+        firstName: shippingDetails.firstName,
+        lastName: shippingDetails.lastName,
+        email: shippingDetails.email,
+        phone: shippingDetails.phone,
+        company: shippingDetails.company, // If applicable
+        country: shippingDetails.country,
+        city: shippingDetails.city,
+        zipCode: shippingDetails.zipCode,
+        address1: shippingDetails.address1,
+        address2: shippingDetails.address2, // Optional
+      },
     };
+
+    console.log("Sending order data:", orderData);  // Log the data being sent
 
     setIsLoading(true);
 
@@ -105,9 +114,8 @@ const CheckoutPage: React.FC = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        const orderId = responseData.orderId; // Extract orderId from the response
+        const orderId = responseData.orderId;
 
-        // Clear cart and redirect to payment page
         localStorage.removeItem("cart");
         router.push(`/payment/[id]?total=${total.toFixed(2)}&orderId=${orderId}`); // Include orderId in the URL
       } else {
@@ -138,6 +146,7 @@ const CheckoutPage: React.FC = () => {
               type="text"
               name="firstName"
               placeholder="First name"
+              value={shippingDetails.firstName}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("firstName") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -145,6 +154,7 @@ const CheckoutPage: React.FC = () => {
               type="text"
               name="lastName"
               placeholder="Last name"
+              value={shippingDetails.lastName}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("lastName") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -154,6 +164,7 @@ const CheckoutPage: React.FC = () => {
               type="email"
               name="email"
               placeholder="Email address"
+              value={shippingDetails.email}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("email") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -161,6 +172,7 @@ const CheckoutPage: React.FC = () => {
               type="text"
               name="phone"
               placeholder="Phone number"
+              value={shippingDetails.phone}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("phone") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -168,6 +180,7 @@ const CheckoutPage: React.FC = () => {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <select
               name="country"
+              value={shippingDetails.country}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("country") ? "border-red-500" : "border-gray-700"}`}
             >
@@ -177,6 +190,7 @@ const CheckoutPage: React.FC = () => {
             </select>
             <select
               name="city"
+              value={shippingDetails.city}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("city") ? "border-red-500" : "border-gray-700"}`}
             >
@@ -190,6 +204,7 @@ const CheckoutPage: React.FC = () => {
               type="text"
               name="zipCode"
               placeholder="Zip code"
+              value={shippingDetails.zipCode}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("zipCode") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -197,6 +212,7 @@ const CheckoutPage: React.FC = () => {
               type="text"
               name="address1"
               placeholder="Address 1"
+              value={shippingDetails.address1}  // Bind value to state
               onChange={handleInputChange}
               className={`p-2 border rounded bg-black text-white ${errors.includes("address1") ? "border-red-500" : "border-gray-700"}`}
             />
@@ -205,6 +221,7 @@ const CheckoutPage: React.FC = () => {
             type="text"
             name="address2"
             placeholder="Address 2 (optional)"
+            value={shippingDetails.address2}  // Bind value to state
             onChange={handleInputChange}
             className="p-2 w-full border border-gray-700 rounded bg-black text-white"
           />
@@ -217,7 +234,6 @@ const CheckoutPage: React.FC = () => {
             {cartItems.map((item) => (
               <div key={item._id} className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  
                   <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded mr-4" />
                   <div>
                     <p className="font-semibold">{item.name}</p>
@@ -236,35 +252,25 @@ const CheckoutPage: React.FC = () => {
             <span>Free</span>
           </div>
           <div className="flex justify-between mb-2">
-            <span>Discount</span>
-            <span>25%</span>
+            <span>Discount (25%)</span>
+            <span>-${discount.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between mb-4">
-            <span>Tax</span>
+          <div className="flex justify-between mb-2">
+            <span>Tax (10%)</span>
             <span>${tax.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-semibold text-lg">
+          <div className="flex justify-between font-semibold mb-4">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
+          <button
+            onClick={handlePlaceOrder}
+            disabled={isLoading}
+            className="w-full bg-green-500 text-white py-2 rounded"
+          >
+            {isLoading ? "Placing order..." : "Place Order"}
+          </button>
         </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-between mt-6">
-        <button
-          onClick={() => router.push("/Carts")}
-          className="px-4 py-2 bg-gray-700 text-white rounded"
-        >
-          Back to Cart
-        </button>
-        <button
-          onClick={handlePlaceOrder}
-          className={`px-4 py-2 text-white rounded ${isLoading ? 'bg-gray-500' : 'bg-yellow-500'}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Placing order...' : 'Place Order'}
-        </button>
       </div>
     </div>
   );

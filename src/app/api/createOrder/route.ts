@@ -1,71 +1,58 @@
-import { NextResponse } from "next/server";
-import { client } from "../../../lib/sanityClient";
-import { v4 as uuidv4 } from 'uuid'; // Use UUID to generate unique order IDs
+import { client } from "../../../lib/sanityClient"; // Your Sanity client setup
+import { v4 as uuidv4 } from 'uuid'; // Use uuid to generate unique keys for each item
 
 export async function POST(req: Request) {
   try {
-    // Parse the incoming JSON body
-    const {
+    // Step 1: Parse and log incoming request data
+    const { userId, items, total, shippingDetails } = await req.json();
+    console.log("Received order data:", { userId, items, total, shippingDetails });
+
+    // Step 2: Prepare the order object for Sanity
+    const order = {
+      _type: 'order', // This is crucial for Sanity to know what type of document you're creating
       userId,
-      customerName,
-      email,
-      phone,
-      address,
-      items,
+      items: items.map(item => ({
+        _type: 'orderItem', // Add the _type to the orderItem to indicate it's an order item
+        _key: uuidv4(), // Generate a unique key for each item
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image, // Ensure the image URL is passed
+      })),
+      shippingDetails: {
+        _type: 'shippingDetails', // Link to the shipping details schema
+        firstName: shippingDetails.firstName,
+        lastName: shippingDetails.lastName,
+        email: shippingDetails.email,
+        phone: shippingDetails.phone,
+        company: shippingDetails.company,
+        country: shippingDetails.country,
+        city: shippingDetails.city,
+        zipCode: shippingDetails.zipCode,
+        address1: shippingDetails.address1,
+        address2: shippingDetails.address2,
+      },
       total,
-    } = await req.json();
+      createdAt: new Date().toISOString(),
+      status: 'pending', // Default status
+    };
 
-    // Log the incoming data for debugging purposes
-    console.log("Incoming order data:", { userId, customerName, email, phone, address, items, total });
-
-    // Validate required fields
-    if (!userId || !customerName || !email || !phone || !address || !items || !total) {
-      return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    // Generate a unique order ID
-    const orderId = uuidv4();  // Generate a unique order ID
+    // Step 3: Log the order data being sent to Sanity
+    console.log("Order data being sent to Sanity:", order);
 
     // Create the order document in Sanity
-    const order = await client.create({
-      _type: "order",
-      _id: orderId,  // Set the unique order ID
-      userId,
-      customerName,
-      email,
-      phone,
-      address,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      items: items.map((item: any) => ({
-        _type: "orderItem", // Make sure the "orderItem" type exists in Sanity schema
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        image: item.image,
-      })),
-      total,
-      status: "pending", // Initial status set to "pending"
+    const createdOrder = await client.create(order);
+
+    // Step 4: Log the response from Sanity
+    console.log("Order successfully created in Sanity with ID:", createdOrder._id);
+
+    return new Response(JSON.stringify({ orderId: createdOrder._id }), {
+      status: 200,
     });
-
-    // Log the created order (optional)
-    console.log("Order created successfully:", order);
-
-    // Return the order data and success response, including the order ID
-    return NextResponse.json({ success: true, orderId }, { status: 201 });
-
   } catch (error) {
-    // Handle any errors that occur during the request processing
     console.error("Error creating order:", error);
-    if (error.response) {
-      // If there's an error from the Sanity API, log and handle it
-      console.error("Sanity API error:", error.response.body);
-    }
-    return NextResponse.json(
-      { success: false, message: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: "Failed to create order." }), {
+      status: 500,
+    });
   }
 }

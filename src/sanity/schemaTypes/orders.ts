@@ -15,14 +15,14 @@ export default {
       type: 'array',
       of: [
         {
-          type: 'orderItem',  // The updated orderItem schema
+          type: 'orderItem',  // Reference to the orderItem schema
         },
       ],
     },
     {
       name: 'shippingDetails',
       title: 'Shipping Details',
-      type: 'shippingDetails',
+      type: 'shippingDetails', // Link to shipping details schema
     },
     {
       name: 'total',
@@ -55,33 +55,29 @@ export const orderItem = {
   type: 'object',
   fields: [
     {
-      name: 'productId',
-      title: 'Product ID',
-      type: 'string',
-    },
-    {
       name: 'name',
       title: 'Name',
-      type: 'string',
+      type: 'string',  // Name of the item in the order
     },
     {
       name: 'price',
       title: 'Price',
-      type: 'number',
+      type: 'number',  // Price of the item
     },
     {
       name: 'quantity',
       title: 'Quantity',
-      type: 'number',
+      type: 'number',  // Quantity of this item in the order
     },
     {
-      name: 'image',  // Add an image field here
+      name: 'image',  // Image field for the item
       title: 'Image',
       type: 'string',  // URL of the image
       description: 'URL of the product image',
     },
   ],
 };
+
 
 // shippingDetails schema
 export const shippingDetails = {

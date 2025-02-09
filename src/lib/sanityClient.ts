@@ -7,7 +7,7 @@ export const client = createClient({
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET!,      // Dataset name (e.g., "production")
   apiVersion: '2021-08-31',  // API version
   useCdn: true,              // Set to true for caching, false for fresh data
-  token: process.env.SANITY_API_TOKEN,  // Add the API token here (make sure it's correct)
+  token: process.env.NEXT_PUBLIC_SANITY_API_TOKEN,  // Add the API token here (make sure it's correct)
 });
 
 // Initialize the image URL builder

@@ -22,10 +22,18 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ total, orderId }) => {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      setErrorMessage("Stripe.js has not loaded yet.");
+      setIsProcessing(false);
+      return;
+    }
 
     const cardElement = elements.getElement(CardElement);
-    if (!cardElement) return;
+    if (!cardElement) {
+      setErrorMessage("Card Element is not available.");
+      setIsProcessing(false);
+      return;
+    }
 
     // Create payment method
     const { error, paymentMethod } = await stripe.createPaymentMethod({
@@ -47,14 +55,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ total, orderId }) => {
       },
       body: JSON.stringify({
         paymentMethodId: paymentMethod.id,
-        amount: total,
+        amount: parseFloat(total) * 100, // Convert amount to cents
+        orderId, // Pass orderId to update status after payment
       }),
     });
 
     const paymentIntent = await response.json();
 
-    if (paymentIntent.error) {
-      setErrorMessage(paymentIntent.error.message);
+    if (!paymentIntent.success) {
+      setErrorMessage(paymentIntent.message);
       setIsProcessing(false);
       return;
     }
